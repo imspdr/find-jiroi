@@ -2,7 +2,8 @@ import { FC, useRef, useMemo, useEffect, useState } from 'react';
 import { useAtom } from 'jotai';
 import { difficultyAtom, gameOverAtom, gameWinAtom } from '../../store/game';
 import { useMinesweeper } from './useMinesweeper';
-import { GameContainer, Grid, Cell, StatusMessage, GameIcon } from './styled';
+import { GameContainer, Grid, StatusMessage } from './styled';
+import MinesweeperCell from './MinesweeperCell';
 
 const JiroiGame: FC = () => {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -34,9 +35,6 @@ const JiroiGame: FC = () => {
     return () => window.removeEventListener('resize', handleResize);
   }, [difficulty]);
 
-  const longPressTimerRef = useRef<Record<string, NodeJS.Timeout>>({});
-  const interactionHandledRef = useRef<Record<string, boolean>>({});
-
   return (
     <GameContainer ref={containerRef} onContextMenu={(e) => e.preventDefault()}>
       {gameOver && (
@@ -46,71 +44,16 @@ const JiroiGame: FC = () => {
       )}
       <Grid rows={difficulty.rows} cols={difficulty.cols} cellSize={cellSize}>
         {grid.map((row, r) =>
-          row.map((cell, c) => {
-            const cellKey = `${r}-${c}`;
-            return (
-              <Cell
-                key={cellKey}
-                revealed={cell.revealed}
-                cellSize={cellSize}
-                neighborCount={cell.revealed ? cell.neighborCount : undefined}
-                onPointerDown={(e) => {
-                  if (cell.revealed) return;
-                  interactionHandledRef.current[cellKey] = false;
-                  const timer = setTimeout(() => {
-                    toggleFlag(r, c);
-                    interactionHandledRef.current[cellKey] = true;
-                  }, 500);
-                  longPressTimerRef.current[cellKey] = timer;
-                }}
-                onPointerUp={(e) => {
-                  if (longPressTimerRef.current[cellKey]) {
-                    clearTimeout(longPressTimerRef.current[cellKey]);
-                    delete longPressTimerRef.current[cellKey];
-                  }
-
-                  if (!interactionHandledRef.current[cellKey]) {
-                    if (cell.revealed) {
-                      chord(r, c);
-                    } else {
-                      revealCell(r, c);
-                    }
-                  }
-                }}
-                onPointerLeave={(e) => {
-                  if (longPressTimerRef.current[cellKey]) {
-                    clearTimeout(longPressTimerRef.current[cellKey]);
-                    delete longPressTimerRef.current[cellKey];
-                  }
-                }}
-                onContextMenu={(e) => {
-                  e.preventDefault();
-                  if (interactionHandledRef.current[cellKey]) return;
-
-                  if (longPressTimerRef.current[cellKey]) {
-                    clearTimeout(longPressTimerRef.current[cellKey]);
-                    delete longPressTimerRef.current[cellKey];
-                  }
-                  toggleFlag(r, c);
-                  interactionHandledRef.current[cellKey] = true;
-                }}
-              >
-                {cell.revealed ? (
-                  cell.isMine ? (
-                    <GameIcon>💣</GameIcon>
-                  ) : cell.neighborCount > 0 ? (
-                    cell.neighborCount
-                  ) : (
-                    ''
-                  )
-                ) : cell.flagged ? (
-                  <GameIcon>🚩</GameIcon>
-                ) : (
-                  ''
-                )}
-              </Cell>
-            );
-          })
+          row.map((cell, c) => (
+            <MinesweeperCell
+              key={`${r}-${c}`}
+              cell={cell}
+              cellSize={cellSize}
+              onReveal={revealCell}
+              onFlag={toggleFlag}
+              onChord={chord}
+            />
+          ))
         )}
       </Grid>
     </GameContainer>
