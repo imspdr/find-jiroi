@@ -7,8 +7,8 @@ import {
   ToastProvider,
   Typography,
   Button,
+  useTheme,
 } from '@imspdr/ui';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useAtom, useSetAtom } from 'jotai';
 import {
   difficultyAtom,
@@ -20,31 +20,20 @@ import {
 import HomePage from './pages/Home';
 import styled from '@emotion/styled';
 
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      staleTime: 1000 * 60 * 5,
-      retry: 1,
-      refetchOnWindowFocus: false,
-    },
-  },
-});
 
 const App: FC = () => {
   const basename = process.env.NODE_ENV === 'production' ? '/template-project' : '/';
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <ThemeProvider>
-        <ToastProvider>
-          <ModalProvider>
-            <BrowserRouter basename={basename}>
-              <AppLayout />
-            </BrowserRouter>
-          </ModalProvider>
-        </ToastProvider>
-      </ThemeProvider>
-    </QueryClientProvider>
+    <ThemeProvider>
+      <ToastProvider>
+        <ModalProvider>
+          <BrowserRouter basename={basename}>
+            <AppLayout />
+          </BrowserRouter>
+        </ModalProvider>
+      </ToastProvider>
+    </ThemeProvider>
   );
 };
 
