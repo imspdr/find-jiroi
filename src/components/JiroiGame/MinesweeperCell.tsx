@@ -22,15 +22,12 @@ const MinesweeperCell: FC<MinesweeperCellProps> = memo(({
   const interactionHandledRef = useRef(false);
 
   const handlePointerDown = (e: React.PointerEvent) => {
-    // Always reset so the previous state doesn't bleed into the next interaction
     interactionHandledRef.current = false;
 
     if (revealed) {
-      // Revealed cells have no long-press action; chord fires on pointerUp
       return;
     }
 
-    // 마우스 우클릭(button=2)은 contextMenu로 처리하므로 타이머 불필요
     if (e.pointerType === 'mouse' && e.button === 2) return;
 
     longPressTimerRef.current = setTimeout(() => {
@@ -45,7 +42,6 @@ const MinesweeperCell: FC<MinesweeperCellProps> = memo(({
       longPressTimerRef.current = null;
     }
 
-    // 마우스 우클릭은 contextMenu 이벤트로 처리하므로 여기서 스킵
     if (e.pointerType === 'mouse' && e.button === 2) return;
 
     if (!interactionHandledRef.current) {
@@ -56,6 +52,7 @@ const MinesweeperCell: FC<MinesweeperCellProps> = memo(({
       } else {
         onReveal(r, c);
       }
+      interactionHandledRef.current = true;
     }
   };
 
@@ -71,7 +68,7 @@ const MinesweeperCell: FC<MinesweeperCellProps> = memo(({
       clearTimeout(longPressTimerRef.current);
       longPressTimerRef.current = null;
     }
-    interactionHandledRef.current = true; // 취소된 인터랙션은 처리된 것으로 표시
+    interactionHandledRef.current = true;
   };
 
   const handleContextMenu = (e: React.MouseEvent) => {
@@ -82,9 +79,10 @@ const MinesweeperCell: FC<MinesweeperCellProps> = memo(({
       longPressTimerRef.current = null;
     }
 
-    // 우클릭은 항상 플래그 토글 (revealed 여부 무관)
-    onFlag(r, c);
-    interactionHandledRef.current = true;
+    if (!interactionHandledRef.current) {
+      onFlag(r, c);
+      interactionHandledRef.current = true;
+    }
   };
 
   return (
