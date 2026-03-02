@@ -40,7 +40,7 @@ module.exports = (env, argv) => {
     },
     plugins: [
       new ModuleFederationPlugin({
-        name: 'find-jiroi',
+        name: 'findjiroi',
         filename: 'remoteEntry.js',
         exposes: {
           './App': './src/App',
