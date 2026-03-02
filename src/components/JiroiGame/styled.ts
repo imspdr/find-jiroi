@@ -22,7 +22,7 @@ export const Grid = styled.div<{ rows: number; cols: number; cellSize: number }>
   overflow: hidden;
 `;
 
-export const Cell = styled.div<{ revealed: boolean; neighborCount?: number }>`
+export const Cell = styled.div<{ revealed: boolean; cellSize: number; neighborCount?: number }>`
   width: 100%;
   height: 100%;
   display: flex;
@@ -30,11 +30,14 @@ export const Cell = styled.div<{ revealed: boolean; neighborCount?: number }>`
   justify-content: center;
   cursor: pointer;
   font-weight: bold;
-  font-size: 20px;
+  font-size: ${({ cellSize }) => Math.max(cellSize * 0.6, 12)}px;
   border-radius: 4px;
   
   background-color: ${({ revealed }) =>
     revealed ? 'var(--imspdr-background-1)' : 'var(--imspdr-background-3)'};
+  
+  touch-action: none;
+  transition: background-color 0.1s ease;
   
   color: ${({ neighborCount }) => {
     if (!neighborCount) return 'inherit';
@@ -60,4 +63,13 @@ export const StatusMessage = styled.div<{ win: boolean }>`
   color: ${({ win }) => (win ? 'var(--imspdr-success-1)' : 'var(--imspdr-danger-1)')};
   pointer-events: none;
   z-index: 10;
+`;
+export const GameIcon = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  font-size: 18px;
+  line-height: 1;
 `;

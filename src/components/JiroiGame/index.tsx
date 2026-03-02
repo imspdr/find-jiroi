@@ -2,7 +2,7 @@ import { FC, useRef, useMemo, useEffect, useState } from 'react';
 import { useAtom } from 'jotai';
 import { difficultyAtom, gameOverAtom, gameWinAtom } from '../../store/game';
 import { useMinesweeper } from './useMinesweeper';
-import { GameContainer, Grid, Cell, StatusMessage } from './styled';
+import { GameContainer, Grid, Cell, StatusMessage, GameIcon } from './styled';
 
 const JiroiGame: FC = () => {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -17,7 +17,7 @@ const JiroiGame: FC = () => {
     const handleResize = () => {
       if (!containerRef.current) return;
       const { width, height } = containerRef.current.getBoundingClientRect();
-      const padding = 80;
+      const padding = 10;
       const availableW = width - padding;
       const availableH = height - padding;
 
@@ -26,13 +26,16 @@ const JiroiGame: FC = () => {
         Math.floor(availableH / difficulty.rows),
         40
       );
-      setCellSize(Math.max(size, 25));
+      setCellSize(Math.max(size, 20));
     };
 
     handleResize();
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, [difficulty]);
+
+  const longPressTimerRef = useRef<Record<string, NodeJS.Timeout>>({});
+  const interactionHandledRef = useRef<Record<string, boolean>>({});
 
   return (
     <GameContainer ref={containerRef} onContextMenu={(e) => e.preventDefault()}>
@@ -43,38 +46,71 @@ const JiroiGame: FC = () => {
       )}
       <Grid rows={difficulty.rows} cols={difficulty.cols} cellSize={cellSize}>
         {grid.map((row, r) =>
-          row.map((cell, c) => (
-            <Cell
-              key={`${r}-${c}`}
-              revealed={cell.revealed}
-              neighborCount={cell.revealed ? cell.neighborCount : undefined}
-              onClick={() => {
-                if (cell.revealed) {
-                  chord(r, c);
-                } else {
-                  revealCell(r, c);
-                }
-              }}
-              onContextMenu={(e) => {
-                e.preventDefault();
-                toggleFlag(r, c);
-              }}
-            >
-              {cell.revealed ? (
-                cell.isMine ? (
-                  '💣'
-                ) : cell.neighborCount > 0 ? (
-                  cell.neighborCount
+          row.map((cell, c) => {
+            const cellKey = `${r}-${c}`;
+            return (
+              <Cell
+                key={cellKey}
+                revealed={cell.revealed}
+                cellSize={cellSize}
+                neighborCount={cell.revealed ? cell.neighborCount : undefined}
+                onPointerDown={(e) => {
+                  if (cell.revealed) return;
+                  interactionHandledRef.current[cellKey] = false;
+                  const timer = setTimeout(() => {
+                    toggleFlag(r, c);
+                    interactionHandledRef.current[cellKey] = true;
+                  }, 500);
+                  longPressTimerRef.current[cellKey] = timer;
+                }}
+                onPointerUp={(e) => {
+                  if (longPressTimerRef.current[cellKey]) {
+                    clearTimeout(longPressTimerRef.current[cellKey]);
+                    delete longPressTimerRef.current[cellKey];
+                  }
+
+                  if (!interactionHandledRef.current[cellKey]) {
+                    if (cell.revealed) {
+                      chord(r, c);
+                    } else {
+                      revealCell(r, c);
+                    }
+                  }
+                }}
+                onPointerLeave={(e) => {
+                  if (longPressTimerRef.current[cellKey]) {
+                    clearTimeout(longPressTimerRef.current[cellKey]);
+                    delete longPressTimerRef.current[cellKey];
+                  }
+                }}
+                onContextMenu={(e) => {
+                  e.preventDefault();
+                  if (interactionHandledRef.current[cellKey]) return;
+
+                  if (longPressTimerRef.current[cellKey]) {
+                    clearTimeout(longPressTimerRef.current[cellKey]);
+                    delete longPressTimerRef.current[cellKey];
+                  }
+                  toggleFlag(r, c);
+                  interactionHandledRef.current[cellKey] = true;
+                }}
+              >
+                {cell.revealed ? (
+                  cell.isMine ? (
+                    <GameIcon>💣</GameIcon>
+                  ) : cell.neighborCount > 0 ? (
+                    cell.neighborCount
+                  ) : (
+                    ''
+                  )
+                ) : cell.flagged ? (
+                  <GameIcon>🚩</GameIcon>
                 ) : (
                   ''
-                )
-              ) : cell.flagged ? (
-                '🚩'
-              ) : (
-                ''
-              )}
-            </Cell>
-          ))
+                )}
+              </Cell>
+            );
+          })
         )}
       </Grid>
     </GameContainer>

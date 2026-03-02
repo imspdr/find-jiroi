@@ -91,14 +91,6 @@ export const useMinesweeper = () => {
       }
     }
 
-    setGrid(newGrid);
-    setIsGameOver(false);
-    setGameOver(false);
-    setGameWin(false);
-    setMineCount(mines);
-    setTimer('00:00');
-    setStartTime(null);
-
     // Initial reveal of corners
     const finalGrid = [...newGrid.map(row => [...row])];
     const reveal = (r: number, c: number, gridState: CellData[][]) => {
@@ -114,12 +106,36 @@ export const useMinesweeper = () => {
     };
 
     corners.forEach(([r, c]) => reveal(r, c, finalGrid));
+
     setGrid(finalGrid);
-  }, [difficulty, getNeighbors, setGameOver, setGameWin, setMineCount, setTimer]);
+    setIsGameOver(false);
+    setStartTime(null);
+  }, [difficulty, getNeighbors]);
+
+  // Sync internal game state to global atoms to avoid "update during render" warnings
+  useEffect(() => {
+    if (grid.length === 0) return;
+    setGameOver(isGameOver);
+
+    const allRevealed = grid.every((row) =>
+      row.every((cell) => cell.isMine || cell.revealed)
+    );
+    const hitMine = grid.flat().some(cell => cell.isMine && cell.revealed);
+
+    if (allRevealed && !hitMine) {
+      setGameWin(true);
+    } else {
+      setGameWin(false);
+    }
+
+    const flagCount = grid.flat().filter((c) => c.flagged).length;
+    setMineCount(difficulty.mines - flagCount);
+  }, [grid, isGameOver, difficulty.mines, setGameOver, setGameWin, setMineCount]);
 
   useEffect(() => {
     initializeGrid();
-  }, [initializeGrid, resetTrigger]);
+    setTimer('00:00');
+  }, [initializeGrid, resetTrigger, setTimer]);
 
   useEffect(() => {
     let interval: any;
@@ -148,8 +164,6 @@ export const useMinesweeper = () => {
       if (cell.isMine) {
         // Game Over
         setIsGameOver(true);
-        setGameOver(true);
-        setGameWin(false);
         // Reveal all mines
         newGrid.forEach((row) =>
           row.forEach((cell) => {
@@ -180,13 +194,11 @@ export const useMinesweeper = () => {
 
       if (allRevealed) {
         setIsGameOver(true);
-        setGameOver(true);
-        setGameWin(true);
       }
 
       return newGrid;
     });
-  }, [difficulty, isGameOver, getNeighbors, startTime, setGameOver, setGameWin]);
+  }, [difficulty, isGameOver, getNeighbors, startTime]);
 
   const toggleFlag = useCallback((r: number, c: number) => {
     if (isGameOver) return;
@@ -197,13 +209,9 @@ export const useMinesweeper = () => {
 
       const newGrid = prev.map((row) => row.map((cell) => ({ ...cell })));
       newGrid[r][c].flagged = !newGrid[r][c].flagged;
-
-      const flagCount = newGrid.flat().filter((c) => c.flagged).length;
-      setMineCount(difficulty.mines - flagCount);
-
       return newGrid;
     });
-  }, [difficulty.mines, isGameOver, setMineCount]);
+  }, [isGameOver]);
 
   const chord = useCallback((r: number, c: number) => {
     if (isGameOver) return;
@@ -239,8 +247,6 @@ export const useMinesweeper = () => {
 
         if (hitMine) {
           setIsGameOver(true);
-          setGameOver(true);
-          setGameWin(false);
           newGrid.forEach((row) =>
             row.forEach((cell) => {
               if (cell.isMine) cell.revealed = true;
@@ -254,8 +260,6 @@ export const useMinesweeper = () => {
 
           if (allRevealed) {
             setIsGameOver(true);
-            setGameOver(true);
-            setGameWin(true);
           }
         }
 
@@ -264,7 +268,7 @@ export const useMinesweeper = () => {
 
       return prev;
     });
-  }, [difficulty.rows, difficulty.cols, getNeighbors, isGameOver, setGameOver, setGameWin]);
+  }, [difficulty.rows, difficulty.cols, getNeighbors, isGameOver]);
 
   return { grid, revealCell, toggleFlag, chord, initializeGrid };
 };
