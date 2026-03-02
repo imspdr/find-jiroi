@@ -10,7 +10,7 @@ module.exports = (env, argv) => {
   const isProduction = argv.mode === 'production' || process.env.NODE_ENV === 'production';
 
   return {
-    entry: './src/index.tsx',
+    entry: env.widgetTest ? './src/test-widget.tsx' : './src/index.tsx',
     mode: isProduction ? 'production' : 'development',
     output: {
       path: path.resolve(__dirname, 'docs'),
@@ -44,12 +44,15 @@ module.exports = (env, argv) => {
         filename: 'remoteEntry.js',
         exposes: {
           './App': './src/App',
+          './MiniMinesweeperWidget': './src/exports/MiniMinesweeperWidget/index.tsx',
         },
         shared: {
           react: { singleton: true, requiredVersion: deps.react },
           'react-dom': { singleton: true, requiredVersion: deps['react-dom'] },
           '@emotion/react': { singleton: true, requiredVersion: deps['@emotion/react'] },
           '@emotion/styled': { singleton: true, requiredVersion: deps['@emotion/styled'] },
+          '@imspdr/ui': { singleton: true, requiredVersion: deps['@imspdr/ui'] },
+          jotai: { singleton: true, requiredVersion: deps.jotai },
         },
       }),
       new HtmlWebpackPlugin({

@@ -1,0 +1,2 @@
+import('./widget-bootstrap');
+export { };
