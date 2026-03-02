@@ -3,11 +3,14 @@ const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const { ModuleFederationPlugin } = require('webpack').container;
 const { CleanWebpackPlugin } = require("clean-webpack-plugin");
+const webpack = require('webpack');
 const Dotenv = require('dotenv-webpack');
+const { name: projectName } = require('./package.json');
 const deps = require('./package.json').dependencies;
 
 module.exports = (env, argv) => {
   const isProduction = argv.mode === 'production' || process.env.NODE_ENV === 'production';
+  const appBasename = isProduction ? `/${projectName}` : '/';
 
   return {
     entry: env.widgetTest ? './src/test-widget.tsx' : './src/index.tsx',
@@ -15,7 +18,7 @@ module.exports = (env, argv) => {
     output: {
       path: path.resolve(__dirname, 'docs'),
       filename: 'bundle.js',
-      publicPath: isProduction ? 'https://imspdr.github.io/find-jiroi/' : '/',
+      publicPath: isProduction ? `https://imspdr.github.io/${projectName}/` : '/',
       clean: true,
     },
     resolve: {
@@ -39,6 +42,9 @@ module.exports = (env, argv) => {
       ],
     },
     plugins: [
+      new webpack.DefinePlugin({
+        'process.env.BASENAME': JSON.stringify(appBasename),
+      }),
       new ModuleFederationPlugin({
         name: 'findjiroi',
         filename: 'remoteEntry.js',

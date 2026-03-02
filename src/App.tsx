@@ -23,7 +23,7 @@ import styled from '@emotion/styled';
 
 
 const App: FC = () => {
-  const basename = process.env.NODE_ENV === 'production' ? '/find-jiroi' : '/';
+  const basename = process.env.BASENAME || '/';
 
   return (
     <ThemeProvider>
