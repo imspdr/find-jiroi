@@ -6,9 +6,42 @@ export const GameContainer = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
   overflow: hidden;
   user-select: none;
+  position: relative;
+`;
+
+export const Viewport = styled.div`
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  padding: 20px;
+  box-sizing: border-box;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-x pan-y; /* Allow 1-finger scroll; pinch handled by JS */
+  display: flex;
+  justify-content: safe center;
+  align-items: safe flex-start;
+
+  &::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: var(--imspdr-background-3);
+    border-radius: 4px;
+    border: 2px solid var(--imspdr-background-2);
+  }
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+`;
+
+export const ZoomWrapper = styled.div`
+  display: inline-block;
+  margin: 0 auto;
+  min-width: max-content;
+  min-height: max-content;
 `;
 
 export const Grid = styled.div<{ rows: number; cols: number; cellSize: number }>`
@@ -19,7 +52,6 @@ export const Grid = styled.div<{ rows: number; cols: number; cellSize: number }>
   background-color: var(--imspdr-background-2);
   padding: 1px;
   border-radius: 8px;
-  overflow: hidden;
 `;
 
 export const Cell = styled.div<{ revealed: boolean; cellSize: number; neighborCount?: number }>`
@@ -36,7 +68,7 @@ export const Cell = styled.div<{ revealed: boolean; cellSize: number; neighborCo
   background-color: ${({ revealed }) =>
     revealed ? 'var(--imspdr-background-1)' : 'var(--imspdr-background-3)'};
   
-  touch-action: none;
+  touch-action: manipulation; /* Allow scroll through but precise tap */
   transition: background-color 0.1s ease;
   
   color: ${({ neighborCount }) => {
