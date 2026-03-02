@@ -15,7 +15,7 @@ module.exports = (env, argv) => {
     output: {
       path: path.resolve(__dirname, 'docs'),
       filename: 'bundle.js',
-      publicPath: isProduction ? '/template-project/' : '/',
+      publicPath: isProduction ? '/find-jiroi/' : '/',
       clean: true,
     },
     resolve: {
@@ -40,7 +40,7 @@ module.exports = (env, argv) => {
     },
     plugins: [
       new ModuleFederationPlugin({
-        name: 'template',
+        name: 'find-jiroi',
         filename: 'remoteEntry.js',
         exposes: {
           './App': './src/App',
