@@ -27,7 +27,7 @@ const MinesweeperCell: FC<MinesweeperCellProps> = memo(({
     longPressTimerRef.current = setTimeout(() => {
       onFlag(r, c);
       interactionHandledRef.current = true;
-    }, 500);
+    }, 200);
   };
 
   const handlePointerUp = () => {
@@ -39,6 +39,8 @@ const MinesweeperCell: FC<MinesweeperCellProps> = memo(({
     if (!interactionHandledRef.current) {
       if (revealed) {
         onChord(r, c);
+      } else if (flagged) {
+        onFlag(r, c);
       } else {
         onReveal(r, c);
       }

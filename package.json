@@ -1,6 +1,6 @@
 {
   "name": "find-jiroi",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Find Jiroi",
   "scripts": {
     "dev": "webpack serve --mode development",

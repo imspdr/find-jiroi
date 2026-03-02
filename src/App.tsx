@@ -40,14 +40,18 @@ const App: FC = () => {
 
 const HeaderControls = styled.div<{ isPc: boolean }>`
   display: flex;
-  gap: ${({ isPc }) => (isPc ? '8px' : '4px')};
+  gap: ${({ isPc }) => (isPc ? '8px' : '2px')};
   align-items: center;
+  flex-shrink: 1;
+  min-width: 0;
 `;
 
 const StatusWrapper = styled.div<{ isPc: boolean }>`
   display: flex;
-  gap: ${({ isPc }) => (isPc ? '16px' : '8px')};
+  gap: ${({ isPc }) => (isPc ? '16px' : '4px')};
   align-items: center;
+  flex-shrink: 0;
+  white-space: nowrap;
 `;
 
 const AppLayout: FC = () => {
@@ -107,10 +111,10 @@ const AppLayout: FC = () => {
 
   const rightContent = (
     <StatusWrapper isPc={isPc}>
-      <Typography variant="body" level={2} bold>
+      <Typography variant="body" level={isPc ? 2 : 3} bold>
         🚩 {mineCount}
       </Typography>
-      <Typography variant="body" level={2} bold>
+      <Typography variant="body" level={isPc ? 2 : 3} bold>
         ⏱ {timer}
       </Typography>
     </StatusWrapper>

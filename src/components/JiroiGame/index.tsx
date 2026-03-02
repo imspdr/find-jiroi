@@ -27,7 +27,7 @@ const JiroiGame: FC = () => {
         Math.floor(availableH / difficulty.rows),
         40
       );
-      setCellSize(Math.max(size, 20));
+      setCellSize(Math.max(size, 16));
     };
 
     handleResize();

@@ -50,8 +50,21 @@ export const Cell = styled.div<{ revealed: boolean; cellSize: number; neighborCo
     return colors[neighborCount] || 'inherit';
   }};
 
-  &:hover {
-    filter: brightness(0.9);
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+
+  &:active {
+    filter: none;
+    outline: none;
+  }
+  
+  @media (hover: hover) {
+    &:hover {
+      filter: brightness(0.9);
+    }
   }
 `;
 
@@ -64,12 +77,6 @@ export const StatusMessage = styled.div<{ win: boolean }>`
   pointer-events: none;
   z-index: 10;
 `;
-export const GameIcon = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 20px;
-  height: 20px;
-  font-size: 18px;
+export const GameIcon = styled.span`
   line-height: 1;
 `;
