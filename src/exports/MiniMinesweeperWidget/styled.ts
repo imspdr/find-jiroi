@@ -11,8 +11,8 @@ export const WidgetContainer = styled.div`
   overflow: hidden;
   box-sizing: border-box;
   border: 1px solid var(--imspdr-background-3);
-  width: 420px;
-  height: 480px;
+  width: 100%;
+  height: 100%;
 `;
 
 export const ControlBar = styled.div`
@@ -39,6 +39,7 @@ export const StatusBar = styled.div`
 export const GameBox = styled.div`
   flex: 1;
   min-height: 0;
+  overflow: auto;
 `;
 
 /* ── Mobile Widget (simple bomb icon tile) ── */

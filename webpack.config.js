@@ -52,7 +52,6 @@ module.exports = (env, argv) => {
           '@emotion/react': { singleton: true, requiredVersion: deps['@emotion/react'] },
           '@emotion/styled': { singleton: true, requiredVersion: deps['@emotion/styled'] },
           '@imspdr/ui': { singleton: true, requiredVersion: deps['@imspdr/ui'] },
-          jotai: { singleton: true, requiredVersion: deps.jotai },
         },
       }),
       new HtmlWebpackPlugin({
