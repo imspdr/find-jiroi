@@ -232,6 +232,7 @@ export const useMinesweeper = () => {
           if (target.revealed || target.flagged) return;
 
           if (target.isMine) {
+            target.revealed = true; // Show the mine that was hit
             hitMine = true;
             return;
           }

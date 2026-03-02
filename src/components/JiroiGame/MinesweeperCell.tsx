@@ -22,8 +22,14 @@ const MinesweeperCell: FC<MinesweeperCellProps> = memo(({
   const interactionHandledRef = useRef(false);
 
   const handlePointerDown = (e: React.PointerEvent) => {
-    if (revealed) return;
+    // Always reset so the previous state doesn't bleed into the next interaction
     interactionHandledRef.current = false;
+
+    if (revealed) {
+      // Revealed cells have no long-press action; chord fires on pointerUp
+      return;
+    }
+
     longPressTimerRef.current = setTimeout(() => {
       onFlag(r, c);
       interactionHandledRef.current = true;
