@@ -15,7 +15,7 @@ module.exports = (env, argv) => {
     output: {
       path: path.resolve(__dirname, 'docs'),
       filename: 'bundle.js',
-      publicPath: isProduction ? '/find-jiroi/' : '/',
+      publicPath: isProduction ? 'https://imspdr.github.io/find-jiroi/' : '/',
       clean: true,
     },
     resolve: {
